@@ -14,11 +14,11 @@ variable "vm_os_private_key" {
   type = "string"
 }
 
- variable "admin_user" {
+ variable "ocp_admin_user" {
   type = "string"
 }
 
-variable "admin_pass" {
+variable "ocp_admin_pass" {
   type = "string"
 }
 
@@ -38,7 +38,7 @@ variable "icp_admin_user" {
   type = "string"
 }
 
-variable "icp_admin_password" {
+variable "icp_admin_pass" {
   type = "string"
 }
 
