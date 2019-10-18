@@ -58,6 +58,10 @@ variable "man_cluster_on_hub" {
   type = "string"
 }
 
+variable "cluster_name" {
+  type = "string"
+}
+
 ###
 #Docker registry variables
 ###
