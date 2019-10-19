@@ -38,7 +38,7 @@ while test $# -gt 0; do
   [[ $1 =~ ^-hu|--hubuser ]] && { HUBUSER="${2}"; shift 2; continue; };
   [[ $1 =~ ^-hp|--hubpassword ]] && { HUBPASS="${2}"; shift 2; continue; };
   [[ $1 =~ ^-mch|--manclusterhub ]] && { MANCLUSTERHUB="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-u|--user ]] && { ICP_ADMIN_USER="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-icpu|--user ]] && { ICP_ADMIN_USER="${2}"; shift 2; continue; };
   [[ $1 =~ ^-pw|--password ]] && { ICP_ADMIN_PASS="${2}"; shift 2; continue; };
   [[ $1 =~ ^-s|--icpsrvrurl ]] && { PARAM_ICP_SRVR_URL="${2}"; shift 2; continue; };  	
   [[ $1 =~ ^-v|--icpimage ]] && { PARAM_CLUSTER_INCEPTION_IMAGE="${2}"; shift 2; continue; };  
