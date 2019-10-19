@@ -54,9 +54,9 @@ resource "null_resource" "import_icp" {
   provisioner "remote-exec" {
     inline = [    
       "chmod 755 /var/lib/registry/mcm_scripts/mcm_import_prereq.sh",
-      "echo /var/lib/registry/mcm_scripts/mcm_import_prereq.sh -ru ${var.rhsm_user} -rp ${var.rhsm_password} -hs ${var.mcm_controller_server_name}",
-      #"bash -c '/var/lib/registry/mcm_scripts/mcm_import_prereq.sh -ru ${var.rhsm_user} -rp ${var.rhsm_password} -hs ${var.mcm_controller_server_name} -kc ${var.cluster_config} -kk  ${var.cluster_certificate_authority}'",
-      "bash -c '/var/lib/registry/mcm_scripts/mcm_import_prereq.sh -ru ${var.rhsm_user} -rp ${var.rhsm_password} -hs ${var.mcm_controller_server_name}'",
+      "echo /var/lib/registry/mcm_scripts/mcm_import_prereq.sh -c ${var.cluster_name} -h ${var.icp_server_url}",
+      #"bash -c '/var/lib/registry/mcm_scripts/mcm_import_prereq.sh -c ${var.cluster_name} -h ${var.icp_server_url} -kc ${var.cluster_config} -kk  ${var.cluster_certificate_authority}'",
+      "bash -c '/var/lib/registry/mcm_scripts/mcm_import_prereq.sh -c ${var.cluster_name} -h ${var.icp_server_url}'",
       
       "chmod 755 /var/lib/registry/mcm_scripts/mcm_import.sh",
       "echo /var/lib/registry/mcm_scripts/mcm_import.sh -u ${var.ocp_admin_user} -ru ${var.rhsm_user} -osu ${var.ocp_server_url} -rh ${var.cluster_docker_registry_server_name} -rp ${var.cluster_docker_registry_server_port} -ri ${var.cluster_docker_registry_server_ip} -cm ${var.cluster_name} -pa ${var.icp_dir} -hs ${var.mcm_controller_server_name} -hu ${var.mcm_controller_admin_user} -mch ${var.man_cluster_on_hub} -u ${var.icp_admin_user} -v ${var.icp_inception_image} -s ${var.icp_server_url}",

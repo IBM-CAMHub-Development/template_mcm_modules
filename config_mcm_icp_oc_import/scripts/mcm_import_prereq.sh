@@ -6,26 +6,27 @@
 #US Government Users Restricted Rights - Use, duplication or
 #disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 #
+set -e
 systemArch=$(arch)
 
 # Get script parameters
 while test $# -gt 0; do
-  [[ $1 =~ ^-ru|--rhususer ]] && { RHSM_USERNAME="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-rp|--rhuspass ]] && { RHSM_PASSWORD="${2}"; shift 2; continue; };  
-  [[ $1 =~ ^-hs|--hub ]] && { HUB="${2}"; shift 2; continue; }; 
+  [[ $1 =~ ^-c|--cluster ]] && { PARAM_CLUSTER="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-h|--icpsrvrurl ]] && { PARAM_ICP_SRVR_URL="${2}"; shift 2; continue; };
   #[[ $1 =~ ^-kc|--kubeconfig ]] && { CLUSTER_CONFIG="${2}"; shift 2; continue; };
-  #[[ $1 =~ ^-kk|--kubecacert ]] && { CLUSTER_CA_CERT="${2}"; shift 2; continue; };  	  			
+  #[[ $1 =~ ^-kk|--kubecacert ]] && { CLUSTER_CA_CERT="${2}"; shift 2; continue; };  	
   break;
 done
 
-lsb_release -a | grep RedHat
-RESULT=$(echo $?)
-
-if [ $RESULT -eq 1 ]; then
-	echo "This Linux Distribution does not support OpenShift. Use RedHat to deploy this template."
+if [ -z "$PARAM_CLUSTER" ]; then
+	echo "Managed ICP cluster name is required but missing. Failed to register ICP to hub cluster."
 	exit 1
 fi
-set -e
+
+if [ -z "$PARAM_ICP_SRVR_URL" ]; then
+	echo "Server URL of managed ICP is missing.Failed to register ICP to hub cluster."
+	exit 1
+fi
 
 #if [ -z "$CLUSTER_CONFIG" ]; then
 #	echo "Kubernetes config of managed ICP is missing. Provide base64 encoded configuration value and re-deploy. Failed to register ICP to hub cluster."
@@ -36,21 +37,16 @@ set -e
 #	echo "Kubernetes CA certificate is missing. Will connect without CA certificate."
 #fi
 
-if [ -z "$HUB" ]; then
-	echo "Hub cluster server is missing. Failed to register ICP to hub cluster."
-	exit 1
-fi
-
 if ! which kubectl; then
-	echo "install kubectl"
-	curl -kLo kubectl-linux-${systemArch} ${HUB}/api/cli/kubectl-linux-amd64
+	echo "install kubectl from ${PARAM_ICP_SRVR_URL}"
+	curl -kLo kubectl-linux-${systemArch} ${PARAM_ICP_SRVR_URL}/api/cli/kubectl-linux-amd64	
 	chmod +x ./kubectl-linux-${systemArch}	
 	sudo mv ./kubectl-linux-${systemArch} /usr/local/bin/kubectl
 fi
 
 if ! which cloudctl; then
-	echo "install cloudctl"
-	curl -kLo "cloudctl-linux-${systemArch}" ${HUB}/api/cli/cloudctl-linux-amd64
+	echo "install cloudctl from ${PARAM_CLUSTER_CONSOLE_HOST}"
+	curl -kLo "cloudctl-linux-${systemArch}" ${PARAM_ICP_SRVR_URL}/api/cli/cloudctl-linux-amd64	
 	chmod +x "./cloudctl-linux-${systemArch}"
 	sudo mv "./cloudctl-linux-${systemArch}" /usr/local/bin/cloudctl
 fi
@@ -60,16 +56,7 @@ if ! which docker; then
 	curl -fsSL https://get.docker.com/ | sudo sh
 fi
 
-if ! which oc; then
-	echo "install oc"
-	sudo subscription-manager register --username ${RHSM_USERNAME} --password ${RHSM_PASSWORD}
-	sudo subscription-manager refresh
-	sudo subscription-manager attach
-	sudo subscription-manager repos --enable="rhel-7-server-ose-3.11-rpms"
-	sudo yum install -y atomic-openshift-clients		
-fi
-
-#echo "Set up managed OCP kube cluster context from kubeconfig data object"
+#echo "Set up managed ICP kube cluster context from kubeconfig data object"
 #KUBECONFIG_FILE=/var/lib/registry/mcm_scripts/managedconfig
 #echo ${CLUSTER_CONFIG} | base64 -d > ${KUBECONFIG_FILE}
 #export KUBECONFIG=${KUBECONFIG_FILE}
