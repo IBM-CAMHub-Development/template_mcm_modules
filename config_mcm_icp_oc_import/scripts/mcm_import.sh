@@ -110,10 +110,10 @@ if [ -z "$ICP_ADMIN_USER" ]; then
 	exit 1
 fi
 
-if [ -z "$ICP_ADMIN_PASS" ]; then
-	echo "Managed cluster administrator user password is missing. Failed to register ICP to hub cluster."
-	exit 1
-fi
+# if [ -z "$ICP_ADMIN_PASS" ]; then
+# 	echo "Managed cluster administrator user password is missing. Failed to register ICP to hub cluster."
+# 	exit 1
+# fi
 
 if [ -z "$PARAM_ICP_SRVR_URL" ]; then
 	echo "Managed cluster ICP Server URL is missing. Failed to register ICP to hub cluster."
@@ -167,7 +167,7 @@ export KUBECONFIG=${KUBECONFIG_FILE}
 #	fi
 #fi
 
-sudo KUBECONFIG=${KUBECONFIG_FILE} oc login ${OCP_SERVER_URL}
+sudo KUBECONFIG=${KUBECONFIG_FILE} oc login ${OCP_SERVER_URL} -u ${OCP_ADMIN_USER} -p ${OCP_ADMIN_PASS}
 
 echo "Verify if the OCP kubeconfig is valid"
 set +e
