@@ -23,23 +23,23 @@ REGULAR='\033[0m'
 
 # Get script parameters
 while test $# -gt 0; do
-  [[ $1 =~ ^-u|--user ]] && { OCP_ADMIN_USER="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-ocpu|--user ]] && { OCP_ADMIN_USER="${2}"; shift 2; continue; };
   [[ $1 =~ ^-ru|--rhususer ]] && { RHSM_USERNAME="${2}"; shift 2; continue; };
   [[ $1 =~ ^-rp|--rhuspass ]] && { RHSM_PASSWORD="${2}"; shift 2; continue; }; 
   [[ $1 =~ ^-osu|--srvrurl ]] && { OCP_SERVER_URL="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-p|--pass ]] && { OCP_ADMIN_PASS="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-ocpw|--pass ]] && { OCP_ADMIN_PASS="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-ri|--clusterregsrverip ]] && { PARAM_CLUSTER_REG_IP="${2}"; shift 2; continue; };   	 	
+  [[ $1 =~ ^-rca|--clusterregca ]] && { PARAM_CLUSTER_REG_CA_CERT="${2}"; shift 2; continue; };  
   [[ $1 =~ ^-rh|--clusterregsrvr ]] && { PARAM_CLUSTER_REG_SERVER="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-rp|--clusterregport ]] && { PARAM_CLUSTER_REG_PORT="${2}"; shift 2; continue; };   	 	
-  [[ $1 =~ ^-rca|--clusterregca ]] && { PARAM_CLUSTER_REG_CA_CERT="${2}"; shift 2; continue; };  	
-  [[ $1 =~ ^-ri|--clusterregsrverip ]] && { PARAM_CLUSTER_REG_IP="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-rp|--clusterregport ]] && { PARAM_CLUSTER_REG_PORT="${2}"; shift 2; continue; };	
   [[ $1 =~ ^-cm|--cluster ]] && { PARAM_CLUSTER="${2}"; shift 2; continue; }; 	
   [[ $1 =~ ^-pa|--path ]] && { ICPDIR="${2}"; shift 2; continue; };
   [[ $1 =~ ^-hs|--hub ]] && { HUB="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-hu|--hubuser ]] && { HUBUSER="${2}"; shift 2; continue; };
   [[ $1 =~ ^-hp|--hubpassword ]] && { HUBPASS="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-hu|--hubuser ]] && { HUBUSER="${2}"; shift 2; continue; };
   [[ $1 =~ ^-mch|--manclusterhub ]] && { MANCLUSTERHUB="${2}"; shift 2; continue; };
   [[ $1 =~ ^-icpu|--user ]] && { ICP_ADMIN_USER="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-pw|--password ]] && { ICP_ADMIN_PASS="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-icpw|--password ]] && { ICP_ADMIN_PASS="${2}"; shift 2; continue; };
   [[ $1 =~ ^-s|--icpsrvrurl ]] && { PARAM_ICP_SRVR_URL="${2}"; shift 2; continue; };  	
   [[ $1 =~ ^-v|--icpimage ]] && { PARAM_CLUSTER_INCEPTION_IMAGE="${2}"; shift 2; continue; };  
   	
@@ -110,10 +110,10 @@ if [ -z "$ICP_ADMIN_USER" ]; then
 	exit 1
 fi
 
-# if [ -z "$ICP_ADMIN_PASS" ]; then
-# 	echo "Managed cluster administrator user password is missing. Failed to register ICP to hub cluster."
-# 	exit 1
-# fi
+if [ -z "$ICP_ADMIN_PASS" ]; then
+	echo "Managed cluster administrator user password is missing. Failed to register ICP to hub cluster."
+	exit 1
+fi
 
 if [ -z "$PARAM_ICP_SRVR_URL" ]; then
 	echo "Managed cluster ICP Server URL is missing. Failed to register ICP to hub cluster."
