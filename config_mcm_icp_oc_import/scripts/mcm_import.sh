@@ -25,7 +25,7 @@ REGULAR='\033[0m'
 while test $# -gt 0; do
   [[ $1 =~ ^-ocpu|--user ]] && { OCP_ADMIN_USER="${2}"; shift 2; continue; };
   [[ $1 =~ ^-ru|--rhususer ]] && { RHSM_USERNAME="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-rp|--rhuspass ]] && { RHSM_PASSWORD="${2}"; shift 2; continue; }; 
+  [[ $1 =~ ^-rhw|--rhuspass ]] && { RHSM_PASSWORD="${2}"; shift 2; continue; }; 
   [[ $1 =~ ^-osu|--srvrurl ]] && { OCP_SERVER_URL="${2}"; shift 2; continue; };
   [[ $1 =~ ^-ocpw|--pass ]] && { OCP_ADMIN_PASS="${2}"; shift 2; continue; };
   [[ $1 =~ ^-ri|--clusterregsrverip ]] && { PARAM_CLUSTER_REG_IP="${2}"; shift 2; continue; };   	 	
