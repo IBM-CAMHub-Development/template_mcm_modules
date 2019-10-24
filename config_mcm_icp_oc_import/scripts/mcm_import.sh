@@ -216,7 +216,7 @@ else
 	# echo "private_registry_enabled: true" | tee -a /var/lib/registry/mcm_scripts/cluster-import.yaml
 	# echo "docker_username: ${ADMIN_USER}" | tee -a /var/lib/registry/mcm_scripts/cluster-import.yaml
 	# echo "docker_password: ${ADMIN_PASS}" | tee -a /var/lib/registry/mcm_scripts/cluster-import.yaml
-	sed -i -e "s|inception_image:.*|inception_image: docker-registry.default.svc:5000/ibmcom/icp-inception:3.2.0-amd64-ee|" /var/lib/registry/mcm_scripts/cluster-import.yaml	
+	sed -i -e "s|inception_image:.*|inception_image: docker-registry.default.svc:5000/ibmcom/icp-inception:3.2.0-rhel-ee|" /var/lib/registry/mcm_scripts/cluster-import.yaml	
 fi
 
 echo "Import template to hub"
