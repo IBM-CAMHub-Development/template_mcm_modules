@@ -23,25 +23,25 @@ REGULAR='\033[0m'
 
 # Get script parameters
 while test $# -gt 0; do
-  [[ $1 =~ ^-ocpu|--user ]] && { OCP_ADMIN_USER="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-ru|--rhususer ]] && { RHSM_USERNAME="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-rhw|--rhuspass ]] && { RHSM_PASSWORD="${2}"; shift 2; continue; }; 
-  [[ $1 =~ ^-osu|--srvrurl ]] && { OCP_SERVER_URL="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-ocpw|--pass ]] && { OCP_ADMIN_PASS="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-ri|--clusterregsrverip ]] && { PARAM_CLUSTER_REG_IP="${2}"; shift 2; continue; };   	 	
-  [[ $1 =~ ^-rca|--clusterregca ]] && { PARAM_CLUSTER_REG_CA_CERT="${2}"; shift 2; continue; };  
-  [[ $1 =~ ^-rh|--clusterregsrvr ]] && { PARAM_CLUSTER_REG_SERVER="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-rp|--clusterregport ]] && { PARAM_CLUSTER_REG_PORT="${2}"; shift 2; continue; };	
-  [[ $1 =~ ^-cm|--cluster ]] && { PARAM_CLUSTER="${2}"; shift 2; continue; }; 	
-  [[ $1 =~ ^-pa|--path ]] && { ICPDIR="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-hs|--hub ]] && { HUB="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-hp|--hubpassword ]] && { HUBPASS="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-hu|--hubuser ]] && { HUBUSER="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-mch|--manclusterhub ]] && { MANCLUSTERHUB="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-icpu|--user ]] && { ICP_ADMIN_USER="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-icpw|--password ]] && { ICP_ADMIN_PASS="${2}"; shift 2; continue; };
-  [[ $1 =~ ^-s|--icpsrvrurl ]] && { PARAM_ICP_SRVR_URL="${2}"; shift 2; continue; };  	
-  [[ $1 =~ ^-v|--icpimage ]] && { PARAM_CLUSTER_INCEPTION_IMAGE="${2}"; shift 2; continue; };  
+  [[ $1 =~ ^-a|--user ]] && { OCP_ADMIN_USER="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-b|--rhususer ]] && { RHSM_USERNAME="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-c|--rhuspass ]] && { RHSM_PASSWORD="${2}"; shift 2; continue; }; 
+  [[ $1 =~ ^-d|--srvrurl ]] && { OCP_SERVER_URL="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-e|--pass ]] && { OCP_ADMIN_PASS="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-f|--clusterregsrverip ]] && { PARAM_CLUSTER_REG_IP="${2}"; shift 2; continue; };   	 	
+  [[ $1 =~ ^-g|--clusterregca ]] && { PARAM_CLUSTER_REG_CA_CERT="${2}"; shift 2; continue; };  
+  [[ $1 =~ ^-h|--clusterregsrvr ]] && { PARAM_CLUSTER_REG_SERVER="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-i|--clusterregport ]] && { PARAM_CLUSTER_REG_PORT="${2}"; shift 2; continue; };	
+  [[ $1 =~ ^-j|--cluster ]] && { PARAM_CLUSTER="${2}"; shift 2; continue; }; 	
+  [[ $1 =~ ^-k|--path ]] && { ICPDIR="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-l|--hub ]] && { HUB="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-m|--hubpassword ]] && { HUBPASS="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-n|--hubuser ]] && { HUBUSER="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-o|--manclusterhub ]] && { MANCLUSTERHUB="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-p|--user ]] && { ICP_ADMIN_USER="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-q|--password ]] && { ICP_ADMIN_PASS="${2}"; shift 2; continue; };
+  [[ $1 =~ ^-r|--icpsrvrurl ]] && { PARAM_ICP_SRVR_URL="${2}"; shift 2; continue; };  	
+  [[ $1 =~ ^-s|--icpimage ]] && { PARAM_CLUSTER_INCEPTION_IMAGE="${2}"; shift 2; continue; };  
   	
   #[[ $1 =~ ^-mcc|--manclustercloud ]] && { MANCLUSTERCLOUD="${2}"; shift 2; continue; };
   #[[ $1 =~ ^-mcv|--manclustervendor ]] && { MANCLUSTERVEN="${2}"; shift 2; continue; };
@@ -216,7 +216,7 @@ else
 	# echo "private_registry_enabled: true" | tee -a /var/lib/registry/mcm_scripts/cluster-import.yaml
 	# echo "docker_username: ${ADMIN_USER}" | tee -a /var/lib/registry/mcm_scripts/cluster-import.yaml
 	# echo "docker_password: ${ADMIN_PASS}" | tee -a /var/lib/registry/mcm_scripts/cluster-import.yaml
-	sed -i -e "s|inception_image:.*|inception_image: docker-registry.default.svc:5000/ibmcom/icp-inception:3.2.0-rhel-ee|" /var/lib/registry/mcm_scripts/cluster-import.yaml	
+	sed -i -e "s|inception_image:.*|inception_image: docker-registry.default.svc:5000/ibmcom/icp-inception:3.2.0-amd64-ee|" /var/lib/registry/mcm_scripts/cluster-import.yaml	
 fi
 
 echo "Import template to hub"
