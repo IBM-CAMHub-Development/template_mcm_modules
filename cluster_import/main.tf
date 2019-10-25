@@ -40,6 +40,7 @@ resource "null_resource" "manage-cluster" {
     environment {
       ## Required
       CLUSTER_NAME                = "${var.cluster_name}"
+      CLUSTER_NAMESPACE           = "${var.cluster_namespace}"	    
       HUB_URL                     = "${var.mcm_url}"
       HUB_ADMIN_USER              = "${var.mcm_admin_user}"
       HUB_ADMIN_PASSWORD          = "${var.mcm_admin_password}"
