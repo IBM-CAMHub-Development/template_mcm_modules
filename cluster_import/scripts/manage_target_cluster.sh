@@ -105,7 +105,7 @@ function parseTargetClusterCredentials() {
     echo "Parsing cluster credentials from ${CLUSTER_CREDENTIALS}..."
     if [ -f "${CLUSTER_CREDENTIALS}" ]; then
          ## Credentials provided via JSON file; Parse endpoint, user and token from file for later verification
-         CLUSTER_NAME=$(cat ${CLUSTER_CREDENTIALS}     | jq -r '.cluster')
+         #CLUSTER_NAME=$(cat ${CLUSTER_CREDENTIALS}     | jq -r '.cluster')
          CLUSTER_ENDPOINT=$(cat ${CLUSTER_CREDENTIALS} | jq -r '.endpoint')
          CLUSTER_USER=$(cat ${CLUSTER_CREDENTIALS}     | jq -r '.user')
          CLUSTER_TOKEN=$(cat ${CLUSTER_CREDENTIALS}    | jq -r '.token')
@@ -314,6 +314,7 @@ function run() {
     export PATH=${WORK_DIR}/bin:${PATH}
 
     ## Check provided hub and target cluster information
+    installKubectlLocally
     verifyMcmHubClusterInformation
     parseTargetClusterCredentials
     if [ "${ACTION}" == "import" ]; then
