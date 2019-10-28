@@ -45,6 +45,7 @@
 
 set -e
 trap cleanup KILL ERR QUIT TERM INT EXIT
+trap "kill 0" EXIT
 
 ## Perform cleanup tasks prior to exit
 function cleanup() {
@@ -97,6 +98,7 @@ function verifyMcmHubClusterInformation() {
         echo "${WARN_ON}MCM hub-cluster admin password is not available${WARN_OFF}"
         exit 1
     fi
+    installKubectlLocally
     installCloudctlLocally
 }
 
@@ -105,7 +107,6 @@ function parseTargetClusterCredentials() {
     echo "Parsing cluster credentials from ${CLUSTER_CREDENTIALS}..."
     if [ -f "${CLUSTER_CREDENTIALS}" ]; then
          ## Credentials provided via JSON file; Parse endpoint, user and token from file for later verification
-         #CLUSTER_NAME=$(cat ${CLUSTER_CREDENTIALS}     | jq -r '.cluster')
          CLUSTER_ENDPOINT=$(cat ${CLUSTER_CREDENTIALS} | jq -r '.endpoint')
          CLUSTER_USER=$(cat ${CLUSTER_CREDENTIALS}     | jq -r '.user')
          CLUSTER_TOKEN=$(cat ${CLUSTER_CREDENTIALS}    | jq -r '.token')
@@ -207,6 +208,10 @@ function prepareClusterImport() {
             sed -i -e "s/version:.*/version: ${IMAGE_VERSION}/" ${CONFIG_FILE}
         fi
     fi
+    echo "Configuration file for cluster resource created"
+    echo "==============================================="
+    cat ${CONFIG_FILE}
+    echo "==============================================="
     IMPORT_STATUS="configured"
 
     echo "Creating the resource for cluster ${CLUSTER_NAME}..."
@@ -215,6 +220,10 @@ function prepareClusterImport() {
 
     echo "Generating import file for target cluster ${CLUSTER_NAME}..."
     hub-cloudctl mc cluster import ${CLUSTER_NAME} -n ${nameSpace} > ${IMPORT_FILE}
+    echo "Import file for target cluster created"
+    echo "==============================================="
+    cat ${IMPORT_FILE}
+    echo "==============================================="
     IMPORT_STATUS="prepared"
 
     ## Disconnect from hub cluster
@@ -282,12 +291,38 @@ function initiateClusterRemoval() {
     ## Connect to hub cluster
     hubClusterLogin
 
-    echo "Initiating removal of target cluster ${CLUSTER_NAME}..."
     nameSpace=${CLUSTER_NAME}
     if [ ! -z "$(echo "${CLUSTER_NAMESPACE}" | tr -d '[:space:]')" ]; then
         nameSpace="${CLUSTER_NAMESPACE}"
     fi
-    hub-cloudctl mc cluster delete ${CLUSTER_NAME} -n ${nameSpace}
+
+    indicatorFile=${WORK_DIR}/.cluster_deleted
+    iterationCount=1
+    iterationInterval=15
+    maxMinutes=20
+    iterationMax=$((maxMinutes * 60 / iterationInterval))
+    rm -f ${indicatorFile}
+
+    echo "Initiating removal of target cluster ${CLUSTER_NAME}..."
+    (${WORK_DIR}/bin/kubectl delete cluster ${CLUSTER_NAME} --namespace ${nameSpace}; touch ${indicatorFile}) &
+    while [ ! -f ${indicatorFile}  -a  ${iterationCount} -lt ${iterationMax} ]; do
+        echo "Waiting for removal of target cluster ${CLUSTER_NAME}..."
+        if [ -f ${indicatorFile} ]; then
+            ## Indicator exists; Prepare to exit loop
+            iterationCount=${iterationMax}
+        else
+            echo "Cluster delete still in progress; Waiting for next check..."
+            iterationCount=$((iterationCount + 1))
+            sleep ${iterationInterval}
+        fi
+    done
+    if [ ! -f ${indicatorFile} ]; then
+        echo "${WARN_ON}Cluster was not deleted within the allotted time; Exiting...${WARN_OFF}"
+        exit 1
+    else
+        echo "Delete of cluster ${CLUSTER_NAME} was successful"
+        IMPORT_STATUS="deleted"
+    fi
 
     ## Disconnect from hub cluster
     hubClusterLogout
@@ -314,7 +349,6 @@ function run() {
     export PATH=${WORK_DIR}/bin:${PATH}
 
     ## Check provided hub and target cluster information
-    installKubectlLocally
     verifyMcmHubClusterInformation
     parseTargetClusterCredentials
     if [ "${ACTION}" == "import" ]; then
