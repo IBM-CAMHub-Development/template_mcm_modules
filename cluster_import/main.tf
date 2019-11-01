@@ -1,7 +1,11 @@
 resource "null_resource" "wait-for-prerequisite" {
+  ## Trigger renewal of resource to allow for changes in prerequisite module
+  triggers {
+    trigger_time = "${timestamp()}"
+  }
   provisioner "local-exec" {
     ## Use the 'dependsOn var, set within prerequisite module, to force dependency to work.
-	command = "echo Completed prerequisite ${var.dependsOn}"
+    command = "echo Completed prerequisite ${var.dependsOn}"
   }
 }
 

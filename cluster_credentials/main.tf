@@ -18,6 +18,12 @@ resource "local_file" "create_certificate_file" {
 }
 
 resource "null_resource" "generate-credentials" {
+  ## Token included in the credentials can expire;
+  ## Trigger new resource to ensure credentials are generated during each plan/apply
+  triggers {
+    trigger_time = "${timestamp()}"
+  }
+
   provisioner "local-exec" {
     command = "chmod 755 ${path.module}/scripts/get_cluster_credentials.sh && ${path.module}/scripts/get_cluster_credentials.sh -ct ${var.cluster_type} -wd ${var.work_directory} -cf ${local.credentials_file}"
     environment {
@@ -32,7 +38,7 @@ resource "null_resource" "generate-credentials" {
       ACCESS_KEY_ID               = "${var.access_key_id}"
       SECRET_ACCESS_KEY           = "${var.secret_access_key}"
       CLUSTER_REGION              = "${var.cluster_region}"
-      # ICP
+      ## ICP
       ICP_URL                     = "${var.icp_url}"
       ICP_ADMIN_USER              = "${var.icp_admin_user}"
       ICP_ADMIN_PASSWORD          = "${var.icp_admin_password}"
@@ -43,4 +49,15 @@ resource "null_resource" "generate-credentials" {
     when    = "destroy"
     command = "mkdir -p ${var.work_directory} && jq -n --arg no_access 'noAccess' '{default:($$no_access)}' > ${local.credentials_file}"
   }
+}
+
+## Log generated credentials
+resource "null_resource" "credentials-generated" {
+    depends_on = ["null_resource.generate-credentials"]
+    triggers {
+      trigger_time = "${timestamp()}"
+    }
+    provisioner "local-exec" {
+      command = "cat ${local.credentials_file} | sed -e 's/token\":.*/token\": *****/'"
+    }
 }

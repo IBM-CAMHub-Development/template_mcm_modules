@@ -5,5 +5,5 @@ output "credentials_jsonfile" {
 
 output "credentials_generated" {
   description = "Indicates completion of module"
-  value       = "${null_resource.generate-credentials.id}"
+  value       = "${null_resource.credentials-generated.id}"
 }
