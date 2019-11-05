@@ -25,10 +25,9 @@ resource "null_resource" "generate-credentials" {
   }
 
   provisioner "local-exec" {
-    command = "chmod 755 ${path.module}/scripts/get_cluster_credentials.sh && ${path.module}/scripts/get_cluster_credentials.sh -ct ${var.cluster_type} -wd ${var.work_directory} -cf ${local.credentials_file}"
+    command = "chmod 755 ${path.module}/scripts/get_cluster_credentials.sh && ${path.module}/scripts/get_cluster_credentials.sh -cn ${var.cluster_name} -ct ${var.cluster_type} -wd ${var.work_directory} -cf ${local.credentials_file}"
     environment {
       ## AKS, EKS, GKE, IKS
-      CLUSTER_NAME                = "${var.cluster_name}"
       CLUSTER_CONFIG_FILE         = "${local.kubeconfig_file}"
       ## IKS
       CLUSTER_CA_CERTIFICATE_FILE = "${local.certificate_file}"
@@ -42,6 +41,10 @@ resource "null_resource" "generate-credentials" {
       ICP_URL                     = "${var.icp_url}"
       ICP_ADMIN_USER              = "${var.icp_admin_user}"
       ICP_ADMIN_PASSWORD          = "${var.icp_admin_password}"
+      ## OCP
+      OCP_URL                     = "${var.ocp_url}"
+      OCP_ADMIN_USER              = "${var.ocp_admin_user}"
+      OCP_ADMIN_PASSWORD          = "${var.ocp_admin_password}"
     }
   }
 

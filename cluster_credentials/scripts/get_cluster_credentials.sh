@@ -20,6 +20,7 @@
 ## Details pertaining to the actions to be taken and target cluster to be
 ## managed should be provided via the following command-line parameters or <environment variable>:
 ## Required for all cluster types:
+##   -cn|--clustername <CLUSTER_NAME>               Name of the target cluster
 ##   -ct|--clustertype <CLUSTER_TYPE>               Type of cluser to be targeted; Valid values include (aks, eks, gke, iks)
 ##   -cf|--credfile <CREDENTIALS_FILE>              Path/name of file in which cluster access credentials will be recorded
 ##   -wd|--workdir <WORK_DIR>                       Directory where temporary work files will be created during the action
@@ -27,8 +28,11 @@
 ##   -is|--icpserverurl <ICP_URL>                   URL (including port) of the ICP server
 ##   -iu|--icpuser <ICP_ADMIN_USER>                 Name of the ICP administration user
 ##   -ip|--icppassword <ICP_ADMIN_PASSWORD>         Password used to authenticate with the ICP server
+## For OCP:
+##   -os|--ocpserverurl <OCP_URL>                   URL (including port) of the OCP server
+##   -ou|--ocpuser <OCP_ADMIN_USER>                 Name of the OCP administration user
+##   -op|--ocppassword <OCP_ADMIN_PASSWORD>         Password used to authenticate with the OCP server
 ## For AKS, EKS, GKE, IKS:
-##   -cn|--clustername <CLUSTER_NAME>               Name of the target cluster
 ##   -kc|--kubeconfig <CLUSTER_CONFIG_FILE>         Path to file of the target cluster's KUBECONFIG file
 ## For IKS:
 ##   -ca|--ikscacert <CLUSTER_CA_CERTIFICATE_FILE>  Path to file of the target cluster's CA certificate (Base64 encoded); Applicable for IKS
@@ -126,6 +130,9 @@ function verifyTargetClusterInformation() {
         verifyIcpInformation
         installIcpCloudctlLocally
         icpClusterLogin
+    elif [ "${CLUSTER_TYPE}" == "ocp" ]; then
+        verifyOcpInformation
+        ocpClusterLogin
     elif [ "${CLUSTER_TYPE}" == "iks" ]; then
         verifyIksInformation
     elif [ "${CLUSTER_TYPE}" == "aks" ]; then
@@ -167,7 +174,7 @@ function parseClusterCredentials() {
     CREDENTIALS_CLUSTER=$(sed -n '/clusters:/,//p' ${KUBECONFIG_FILE} | grep "name: .*" | head -n 1 | awk -F ' +' '{print $3}' | awk '{$1=$1};1' | cut -f2 -d'/')
     CREDENTIALS_ENDPOINT=$(sed -n '/clusters:/,//p' ${KUBECONFIG_FILE} | grep "server: .*" | head -n 1 | awk -F ' +' '{print $3}' | awk '{$1=$1};1')
     CREDENTIALS_USER=$(sed -n '/users:/,//p' ${KUBECONFIG_FILE} | grep "\- name: .*" | head -n 1 | awk -F ' +' '{print $3}' | awk '{$1=$1};1' | cut -f2 -d'/')
-
+    
     if [ "${CLUSTER_TYPE}" == "iks" ]; then
         CREDENTIALS_TOKEN=$(sed -n '/users:/,//p' ${KUBECONFIG_FILE} | grep "id-token: .*" | head -n 1 | awk -F ' +' '{print $3}' | awk '{$1=$1};1')
     elif [ "${CLUSTER_TYPE}" == "gke" ]; then
@@ -315,8 +322,37 @@ function icpClusterLogin() {
     ## Generate KUBECONFIG file to be used when accessing the target cluster
     ${WORK_DIR}/bin/kubectl config view --minify=true --flatten=true > ${KUBECONFIG_FILE}
 
-    echo "Logging out of MCM hub cluster..."
+    echo "Logging out of ICP server..."
     icp-cloudctl logout
+}
+
+## Verify that required details pertaining to the OCP server have been provided
+function verifyOcpInformation() {
+    if [ -z "$(echo "${OCP_URL}" | tr -d '[:space:]')" ]; then
+        echo "${WARN_ON}OCP API URL is not available${WARN_OFF}"
+        exit 1
+    fi
+    if [ -z "$(echo "${OCP_ADMIN_USER}" | tr -d '[:space:]')" ]; then
+        echo "${WARN_ON}OCP admin username is not available${WARN_OFF}"
+        exit 1
+    fi
+    if [ -z "$(echo "${OCP_ADMIN_PASSWORD}" | tr -d '[:space:]')" ]; then
+        echo "${WARN_ON}OCP admin password is not available${WARN_OFF}"
+        exit 1
+    fi
+}
+
+## Authenticate with OCP server in order to obtain cluster-specific information
+function ocpClusterLogin() {
+    echo "Authenticating with OCP server to obtain token for use with kubectl..."
+    ocpToken=$(curl -u ${OCP_ADMIN_USER}:${OCP_ADMIN_PASSWORD} -kI "${OCP_URL}/oauth/authorize?client_id=openshift-challenging-client&response_type=token" | grep -oP "access_token=\K[^&]*")
+    
+    ## Generate KUBECONFIG file to be used when accessing the target cluster
+    ${WORK_DIR}/bin/kubectl config set-cluster     ${CLUSTER_NAME}   --insecure-skip-tls-verify=true --server=${OCP_URL}
+    ${WORK_DIR}/bin/kubectl config set-credentials ${OCP_ADMIN_USER} --token=${ocpToken}
+    ${WORK_DIR}/bin/kubectl config set-context     ${CLUSTER_NAME}   --user=${OCP_ADMIN_USER} --namespace=kube-system --cluster=${CLUSTER_NAME}
+    ${WORK_DIR}/bin/kubectl config use-context     ${CLUSTER_NAME}
+    ${WORK_DIR}/bin/kubectl config view --minify=true --flatten=true > ${KUBECONFIG_FILE}
 }
 
 ## Perform the tasks required to complete the cluster management operation
@@ -330,7 +366,7 @@ function run() {
         echo "${WARN_ON}Type of cluster to be managed has not been specified; Exiting...${WARN_OFF}"
         exit 1
     fi
-    if [ "${CLUSTER_TYPE}" != "icp"  -a  "${CLUSTER_TYPE}" != "ocp" ]; then
+    if [ "${CLUSTER_TYPE}" != "icp" ]; then
         if [ -z "$(echo "${CLUSTER_NAME}" | tr -d '[:space:]')" ]; then
             echo "${WARN_ON}Target cluster name was not provided${WARN_OFF}"
             exit 1
@@ -358,6 +394,10 @@ while test ${#} -gt 0; do
     [[ $1 =~ ^-iu|--icpuser ]]          && { ICP_ADMIN_USER="${2}";              shift 2; continue; };
     [[ $1 =~ ^-ip|--icppassword ]]      && { ICP_ADMIN_PASSWORD="${2}";          shift 2; continue; };
 
+    [[ $1 =~ ^-os|--ocpserverurl ]]     && { OCP_URL="${2}";                     shift 2; continue; };
+    [[ $1 =~ ^-ou|--ocpuser ]]          && { OCP_ADMIN_USER="${2}";              shift 2; continue; };
+    [[ $1 =~ ^-op|--ocppassword ]]      && { OCP_ADMIN_PASSWORD="${2}";          shift 2; continue; };
+    
     [[ $1 =~ ^-ca|--ikscacert ]]        && { CLUSTER_CA_CERTIFICATE_FILE="${2}"; shift 2; continue; };  					  	
     [[ $1 =~ ^-cr|--clusterregion ]]    && { CLUSTER_REGION="${2}";              shift 2; continue; };
     [[ $1 =~ ^-ek|--ekskeyid ]]         && { ACCESS_KEY_ID="${2}";               shift 2; continue; };  					  	

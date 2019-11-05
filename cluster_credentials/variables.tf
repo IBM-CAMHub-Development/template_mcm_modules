@@ -18,7 +18,7 @@ variable "icp_admin_password" {
 }
 
 variable "cluster_name" {
-  description = "Name of the kubernetes cluster"
+  description = "Name of the Kubernetes cluster"
   default = ""
 }
 
@@ -49,6 +49,21 @@ variable "access_key_id" {
 
 variable "secret_access_key" {
   description = "Password/secret key for authorizing with cloud and/or cluster"
+  default = ""
+}
+
+variable "ocp_url" {
+  description = "URL, including port, for OCP server"
+  default = ""
+}
+
+variable "ocp_admin_user" {
+  description = "User name for connecting to the OCP server"
+  default = ""
+}
+
+variable "ocp_admin_password" {
+  description = "Password for connecting to the OCP server"
   default = ""
 }
 

@@ -32,6 +32,13 @@ For ICP clusters:
 | icp\_admin\_user                | User name for connecting to the ICP server | true | |
 | icp\_admin\_password            | Password for connecting to the ICP server | true | |
 
+For OCP clusters:
+| Parameter Name                  | Parameter Description | Required | Allowed Values |
+| :---                            | :--- | :--- | :--- |
+| ocp\_url                        | URL, including port, for the OCP server | true | |
+| ocp\_admin\_user                | User name for connecting to the OCP server | true | |
+| ocp\_admin\_password            | Password for connecting to the OCP server | true | |
+
 For Microsoft Azure Kubernetes Service (AKS) clusters:
 | Parameter Name                  | Parameter Description | Required | Allowed Values |
 | :---                            | :--- | :--- | :--- |
