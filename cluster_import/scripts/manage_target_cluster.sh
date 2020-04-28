@@ -167,14 +167,14 @@ function verifyTargetClusterAccess() {
 function hubClusterLogin() {
     echo "Logging into the MCM hub cluster..."
     mkdir -p ${WORK_DIR}/.helm
-    export CLOUDCTL_HOME=${WORK_DIR}/.helm
+    export CLOUDCTL_HOME=${WORK_DIR}/bin
     hub-cloudctl login -a ${HUB_URL} --skip-ssl-validation -u ${HUB_ADMIN_USER} -p ${HUB_ADMIN_PASSWORD} -n default
 }
 
 ## Logout from the MCM hub-cluster
 function hubClusterLogout() {
     echo "Logging out of MCM hub cluster..."
-    export CLOUDCTL_HOME=${WORK_DIR}/.helm
+    export CLOUDCTL_HOME=${WORK_DIR}/bin
     hub-cloudctl logout
 }
 
@@ -419,7 +419,6 @@ fi
 ## Prepare work directory
 mkdir -p ${WORK_DIR}/bin
 export PATH=${WORK_DIR}/bin:${PATH}
-export CLOUDCTL_HOME=${WORK_DIR}/bin
 
 ## Set default variable values
 IMPORT_STATUS="unknown"
