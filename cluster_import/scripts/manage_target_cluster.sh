@@ -63,7 +63,7 @@ function installCloudctlLocally() {
         chmod +x ${WORK_DIR}/bin/hub-cloudctl
         #Download mv plugin
         wget --quiet --no-check-certificate ${HUB_URL}/rcm/plugins/mc-linux-amd64 -P ${WORK_DIR}/bin
-        ${WORK_DIR}/bin/hub-cloudctl plugin install -f mc-linux-amd64
+        hub-cloudctl plugin install -f ${WORK_DIR}/bin/mc-linux-amd64
     else
         echo "cloudctl has already been installed; No action taken"
     fi
