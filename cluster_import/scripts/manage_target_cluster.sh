@@ -419,6 +419,7 @@ fi
 ## Prepare work directory
 mkdir -p ${WORK_DIR}/bin
 export PATH=${WORK_DIR}/bin:${PATH}
+export CLOUDCTL_HOME=${WORK_DIR}/bin
 
 ## Set default variable values
 IMPORT_STATUS="unknown"
