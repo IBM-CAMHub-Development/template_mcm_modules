@@ -191,6 +191,7 @@ function prepareClusterImport() {
     if [ ! -z "$(echo "${CLUSTER_NAMESPACE}" | tr -d '[:space:]')" ]; then
         nameSpace="${CLUSTER_NAMESPACE}"
     fi
+    hub-cloudctl mc cluster template ${CLUSTER_NAME} -n ${nameSpace}
     hub-cloudctl mc cluster template ${CLUSTER_NAME} -n ${nameSpace} > ${CONFIG_FILE}
 
     ## If image registry is provided, modify config template to include registry details
