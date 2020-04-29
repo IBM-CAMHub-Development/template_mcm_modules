@@ -247,7 +247,24 @@ function prepareClusterImport() {
 function initiateClusterImport() {
     echo "Applying import file to target cluster ${CLUSTER_NAME}..."
     export KUBECONFIG=${KUBECONFIG_FILE}
-    ${WORK_DIR}/bin/kubectl apply -f ${IMPORT_FILE}
+    set +e
+    OUT=`${WORK_DIR}/bin/kubectl apply -f ${IMPORT_FILE}`    
+    #
+    #See CP4MCM import cli doc, apply will fail with 
+    #no matches for kind "Endpoint" in version "multicloud.ibm.com/v1beta1"
+    #retry
+    #
+    if [ $? -ne "0" ]; then
+        echo $OUT
+        if [[ $OUT = *"no matches for kind"* ]]; then
+          echo "Retry import"
+          OUT=`${WORK_DIR}/bin/kubectl apply -f ${IMPORT_FILE}`  
+          echo $OUT
+        fi
+    else
+      echo $OUT
+    fi     
+    set -e
     IMPORT_STATUS="applied"
     unset KUBECONFIG
 }
