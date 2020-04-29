@@ -40,7 +40,7 @@ resource "null_resource" "manage-cluster" {
 }
 
 resource "null_resource" "remove-cluster" {
-  depends_on = [null_resource.wait-for-prerequisite]
+  depends_on = ["null_resource.wait-for-prerequisite"]
   provisioner "local-exec" {
     when    = "destroy"
     command = "chmod 755 ${path.module}/scripts/manage_target_cluster.sh && ${path.module}/scripts/manage_target_cluster.sh -ac remove -wd ${var.work_directory}"
