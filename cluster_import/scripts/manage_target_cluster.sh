@@ -254,14 +254,18 @@ function initiateClusterImport() {
     #no matches for kind "Endpoint" in version "multicloud.ibm.com/v1beta1"
     #retry
     #
-    if [ $? -ne "0" ]; then
-        echo $OUT
+    RC=$?
+    echo "Return code is "$RC
+    if [[ $RC -ne 0 ]]; then
+        echo "Import apply failed"
+        echo $OUT        
         if [[ $OUT = *"no matches for kind"* ]]; then
           echo "Retry import"
           OUT=`${WORK_DIR}/bin/kubectl apply -f ${IMPORT_FILE}`  
           echo $OUT
         fi
     else
+      echo "Import applied"
       echo $OUT
     fi     
     set -e
