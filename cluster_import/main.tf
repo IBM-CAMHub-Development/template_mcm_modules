@@ -37,7 +37,10 @@ resource "null_resource" "manage-cluster" {
       DOCKER_PASSWORD             = "${var.docker_password}"
     }
   }
-  
+}
+
+resource "null_resource" "remove-cluster" {
+  depends_on = [null_resource.wait-for-prerequisite]
   provisioner "local-exec" {
     when    = "destroy"
     command = "chmod 755 ${path.module}/scripts/manage_target_cluster.sh && ${path.module}/scripts/manage_target_cluster.sh -ac remove -wd ${var.work_directory}"
@@ -49,5 +52,5 @@ resource "null_resource" "manage-cluster" {
       HUB_ADMIN_USER              = "${var.mcm_admin_user}"
       HUB_ADMIN_PASSWORD          = "${var.mcm_admin_password}"
     }
-  }
+  }    
 }
