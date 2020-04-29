@@ -61,9 +61,6 @@ function installCloudctlLocally() {
         wget --quiet --no-check-certificate ${HUB_URL}/api/cli/cloudctl-linux-amd64 -P ${WORK_DIR}/bin
         mv ${WORK_DIR}/bin/cloudctl-linux-amd64 ${WORK_DIR}/bin/hub-cloudctl
         chmod +x ${WORK_DIR}/bin/hub-cloudctl
-        #Download mv plugin
-        wget --quiet --no-check-certificate ${HUB_URL}/rcm/plugins/mc-linux-amd64 -P ${WORK_DIR}/bin
-        hub-cloudctl plugin install -f ${WORK_DIR}/bin/mc-linux-amd64
     else
         echo "cloudctl has already been installed; No action taken"
     fi
@@ -166,15 +163,15 @@ function verifyTargetClusterAccess() {
 ## Authenticate with MCM hub-cluster in order to perform import/remove operations
 function hubClusterLogin() {
     echo "Logging into the MCM hub cluster..."
-    mkdir -p ${WORK_DIR}/.helm
-    export CLOUDCTL_HOME=${WORK_DIR}/bin
+    mkdir -p ${WORK_DIR}/.helm  
+    export CLOUDCTL_HOME=${WORK_DIR}/.helm  
     hub-cloudctl login -a ${HUB_URL} --skip-ssl-validation -u ${HUB_ADMIN_USER} -p ${HUB_ADMIN_PASSWORD} -n default
 }
 
 ## Logout from the MCM hub-cluster
 function hubClusterLogout() {
     echo "Logging out of MCM hub cluster..."
-    export CLOUDCTL_HOME=${WORK_DIR}/bin
+    export CLOUDCTL_HOME=${WORK_DIR}/.helm 
     hub-cloudctl logout
 }
 
@@ -185,7 +182,9 @@ function hubClusterLogout() {
 function prepareClusterImport() {
     ## Connect to hub cluster
     hubClusterLogin
-
+    #Download mc plugin
+    wget --quiet --no-check-certificate ${HUB_URL}/rcm/plugins/mc-linux-amd64 -P ${WORK_DIR}/bin
+    hub-cloudctl plugin install -f ${WORK_DIR}/bin/mc-linux-amd64
     echo "Generating configuration file template..."
     nameSpace=${CLUSTER_NAME}
     if [ ! -z "$(echo "${CLUSTER_NAMESPACE}" | tr -d '[:space:]')" ]; then
