@@ -261,14 +261,14 @@ function initiateClusterImport() {
         echo $OUT        
         if [[ $OUT = *"no matches for kind"* ]]; then
           echo "Retry import"
+          set -e
           OUT=`${WORK_DIR}/bin/kubectl apply -f ${IMPORT_FILE}`  
           echo $OUT
         fi
     else
       echo "Import applied"
       echo $OUT
-    fi     
-    set -e
+    fi         
     IMPORT_STATUS="applied"
     unset KUBECONFIG
 }
