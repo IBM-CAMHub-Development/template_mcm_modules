@@ -271,7 +271,7 @@ function initiateClusterImport() {
     	else
     		break
     	fi
-    do  
+	done
     if [[ $RC -ne 0 ]]; then
         exitOnError "Unable to apply the import file to target cluster"
     fi          
