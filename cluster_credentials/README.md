@@ -1,5 +1,5 @@
 # MCM Klusterlet within public Kubernetes Service platform
-Copyright IBM Corp. 2019, 2019
+Copyright IBM Corp. 2020, 2020
 This code is released under the Apache 2.0 License.
 
 ## Overview
