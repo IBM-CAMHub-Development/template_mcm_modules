@@ -349,10 +349,12 @@ function initiateClusterRemoval() {
     set +e
     echo "Initiating removal of target cluster ${CLUSTER_NAME}..."
     timeout 20m ${WORK_DIR}/bin/kubectl delete cluster ${CLUSTER_NAME} --namespace ${nameSpace}
-    if [ $? -eq 124 ]; then
+    RC=$?
+    echo "Delete cluster return code is "$RC
+    if [[ $RC -eq 124 ]]; then
         ## Timeout command exited after specified time limit
         exitOnError "Cluster was not deleted within the allotted time"
-    elif [ $? -ne 0 ]; then
+    elif [[ $RC -ne 0 ]]; then
         ## Cluster deletion exited with non-zero exit status
         exitOnError "Deletion of cluster was unsuccessful"
     else
