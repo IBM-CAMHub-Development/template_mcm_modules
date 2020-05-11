@@ -345,8 +345,8 @@ function initiateClusterRemoval() {
     rm -f ${indicatorFile}
 
     set +e
-    echo "Initiating removal of target cluster ${CLUSTER_NAME}..."
-    timeout 20m ${WORK_DIR}/bin/kubectl delete cluster ${CLUSTER_NAME} --namespace ${nameSpace}
+    echo "Initiating removal of target cluster ${CLUSTER_NAME} with timeout of 60 minutes ... "
+    timeout 60m ${WORK_DIR}/bin/kubectl delete cluster ${CLUSTER_NAME} --namespace ${nameSpace}
     RC=$?
     echo "Delete cluster return code is "$RC
     if [[ $RC -eq 124 ]]; then
